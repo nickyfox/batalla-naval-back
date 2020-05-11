@@ -1,0 +1,28 @@
+{
+  "name": "batalla-naval-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.6",
+    "@types/morgan": "^1.9.0",
+    "@types/mysql2": "github:types/mysql2",
+    "@types/node": "^13.13.5",
+    "express": "^4.17.1",
+    "google-auth-library": "^6.0.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.3",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
+  }
+}
