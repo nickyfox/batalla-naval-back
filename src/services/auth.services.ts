@@ -20,13 +20,13 @@ export async function verify(body: any) {
     if(!user.length){
         console.log("SAVING USER");
         const userToSave: User = {
-            id: Number(userid),
+            id: userid,
             username: payload?.name,
             name: payload?.given_name,
             lastName: payload?.family_name,
             email: payload?.email,
         };
-        const userSaved = await saveUser(userToSave)
+        await saveUser(userToSave)
     } else {
         console.log("USUARIO YA ESTA EN LA DB")
     }

@@ -13,5 +13,5 @@ export async function findUserById(id: string | undefined) {
 
 export async function saveUser(user: User) {
     const conn = await connect();
-    const query = await conn.query('INSERT INTO users SET ?', [user]);
+    await conn.query('INSERT INTO users SET ?', [user]);
 }
