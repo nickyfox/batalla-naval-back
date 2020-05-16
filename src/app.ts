@@ -5,10 +5,10 @@ import UsersRoutes from "./routes/users.routes"
 import AuthRoutes from "./routes/auth.routes"
 export class App {
 
-    private app: Application;
-
-    constructor() {
+    public app: Application;
+    constructor(port: string) {
         this.app = express();
+        this.app.set('port', port);
         this.middlewares();
         this.routes();
     }
@@ -22,8 +22,5 @@ export class App {
         this.app.use(morgan("dev"));
         this.app.use(express.json());
         this.app.use(cors())
-    }
-    listen(){
-        this.app.listen(8000, () => console.log('Server running on port 8000!'));
     }
 }
