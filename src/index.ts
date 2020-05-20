@@ -1,6 +1,5 @@
 import { App } from "./app";
 import http from "http";
-
 const socketio = require("socket.io");
 
 async function main() {
@@ -12,10 +11,10 @@ async function main() {
 
     io.on('connection', (socket: any) => {
         console.log("Socket connected " + socket.id);
-        socket.on('message', (body: any) => {
+        socket.on('message', (message: any) => {
             socket.broadcast.emit('message', {
-                body,
-                from: socket.id
+                body: message.body,
+                from: message.from
             })
         });
     });

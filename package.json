@@ -18,6 +18,7 @@
     "@types/morgan": "^1.9.0",
     "@types/mysql2": "github:types/mysql2",
     "@types/node": "^13.13.5",
+    "@types/socket.io": "^2.1.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "google-auth-library": "^6.0.0",
