@@ -40,3 +40,31 @@ export async function updateUser(req: Request, res: Response) {
         message: "User updated"
     })
 }
+
+export async function getUsersWaiting(req: Request, res: Response): Promise<Response> {
+    const conn = await connect();
+    const users = await conn.query("SELECT * FROM users_waiting");
+    return res.json(users[0]);
+}
+
+export async function deleteUserWaiting(req: Request, res: Response) {
+    const conn = await connect();
+    const user_id = req.params.id;
+    await conn.query("DELETE FROM users_waiting WHERE user_id = ?", [user_id]);
+    return res.json({
+        message: "User deleted"
+    })
+}
+
+export async function addUserWaiting(req: Request, res: Response) {
+    const user_id = {user_id: req.body.id};
+    const conn = await connect();
+    try {
+        await conn.query("INSERT INTO users_waiting SET ?", [user_id]);
+    }catch (e) {
+        console.log(e)
+    }
+    return res.json({
+        message: "User added"
+    })
+}

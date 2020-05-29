@@ -11,11 +11,23 @@ async function main() {
 
     io.on('connection', (socket: any) => {
         console.log("Socket connected " + socket.id);
-        socket.on('message', (message: any) => {
-            socket.broadcast.emit('message', {
-                body: message.body,
-                from: message.from
+        socket.on('message', (info: any) => {
+            console.log("MESSAGE SENT");
+            socket.to(info.room).emit('message', {
+                body: info.message.body,
+                from: info.message.from
             })
+        });
+
+        socket.on("only_join_game_room", (users: any) => {
+            console.log("ONLY JOIN GAME ROOM");
+            socket.join(`game_room_${users.userNotWaiting}_${users.userWaiting}`)
+        });
+
+        socket.on("join_game_room_then_send", (users: any) => {
+            console.log("JOIN GAME ROOM FOR ", users);
+            socket.join(`game_room_${users.userNotWaiting}_${users.userWaiting}`);
+            io.emit('sendToGameRoom', {userWaitingId: users.userWaiting, userNotWaitingId: users.userNotWaiting, room: `game_room_${users.userNotWaiting}_${users.userWaiting}`});
         });
     });
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
