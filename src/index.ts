@@ -42,6 +42,20 @@ async function main() {
                 game: game
             });
         });
+
+        socket.on("change game", (info: {room: string, user_id: string}) => {
+            if(game.player1.user.id === info.user_id){
+                game.player1.positionedShips = true;
+            } else {
+                game.player2.positionedShips = true;
+            }
+            socket.to(info.room).emit("receive game", game);
+        });
+
+        socket.on("receive game", (game: Game) => {
+            game = game;
+        });
+
     });
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
 }
