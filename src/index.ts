@@ -3,6 +3,7 @@ import http from "http";
 import Game from "./game/Game";
 const socketio = require("socket.io");
 import {findUserById} from "./services/user.services"
+import {BoardCell} from "./game/BoardCell";
 
 async function main() {
     const port = process.env.PORT || "8000";
@@ -45,25 +46,16 @@ async function main() {
 
         // ----------- GAME MESSAGES ------------------
 
-        /**
-         * First we check if player1 or player2 should be updated
-         * -> we change what is required for the game
-         * -> we update the game and emit an event so the info is updated in the client
-         */
-        socket.on('change user positioned ships', (info: {room: string, user_id: string}) => {
-            console.log("change user positioned ships: ", info.room);
-            console.log("for user: ", info.user_id);
-            if(game.player1.user.id === info.user_id){
-                console.log("change player 1 positioned ships");
-                game = {...game, player1: {...game.player1, positionedShips: true}};
-                console.log("New game state: ", game);
-                io.to(info.room).emit("update game", game)
-            } else {
-                console.log("change player 2 positioned ships");
-                game = {...game, player2: {...game.player2, positionedShips: true}};
-                console.log("New game state: ", game);
-                io.to(info.room).emit("update game", game)
-            }
+        socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>}) => {
+            console.log("send board with placed ships for player 1: ");
+            game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
+            io.to(info.room).emit("update game player 1", game.player1)
+        });
+
+        socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>}) => {
+            console.log("send board with placed ships for player 2: ");
+            game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
+            io.to(info.room).emit("update game player 2", game.player2)
         });
 
         /**
@@ -71,7 +63,7 @@ async function main() {
          */
         socket.on("update game", (newGame: Game) => {
             game = {...newGame};
-            console.log("UPDATE GAME: ", newGame)
+            console.log("UPDATE GAME")
         });
 
         /**

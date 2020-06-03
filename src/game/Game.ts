@@ -15,9 +15,9 @@ const letterMapping: any = {
 
 function createEmptyBoard(player: string): Array<BoardCell> {
     let board: Array<BoardCell> = [];
-    for (let i = 0; i <= 6; i++) {
-        for (let j = 0; j <= 6; j++) {
-            board.push(new BoardCell(`${player}_cell_${i}${letterMapping[j]}`, false, null));
+    for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 6; j++) {
+            board.push(new BoardCell(`${player}_cell_${i}${letterMapping[j]}`, false,false, null));
         }
     }
     return board;
@@ -26,7 +26,7 @@ function createEmptyBoard(player: string): Array<BoardCell> {
 function initializeShips(player: string): Array<Ship> {
     let ships: Array<Ship> = [];
     for (let i = 0; i <= 5; i++) {
-        ships.push(new Ship(`${player}_ship_${i}`, 2))
+        ships.push(new Ship(`${player}_ship_${i}`, `SHIP-${i}`,1))
     }
     return ships;
 }
