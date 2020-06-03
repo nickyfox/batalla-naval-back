@@ -13,20 +13,20 @@ const letterMapping: any = {
     6: 'g',
 };
 
-function createEmptyBoard(isPlayer1: boolean): Array<BoardCell> {
+function createEmptyBoard(player: string): Array<BoardCell> {
     let board: Array<BoardCell> = [];
     for (let i = 0; i <= 6; i++) {
         for (let j = 0; j <= 6; j++) {
-            board.push(new BoardCell(`${i}${letterMapping[j]}`, false, null));
+            board.push(new BoardCell(`${player}_cell_${i}${letterMapping[j]}`, false, null));
         }
     }
     return board;
 }
 
-function initializeShips(): Array<Ship> {
+function initializeShips(player: string): Array<Ship> {
     let ships: Array<Ship> = [];
     for (let i = 0; i <= 5; i++) {
-        ships.push(new Ship(`ship_${i}`, 2))
+        ships.push(new Ship(`${player}_ship_${i}`, 2))
     }
     return ships;
 }
@@ -36,8 +36,8 @@ class Game {
     player2: Player;
 
     constructor(user1: User, user2: User) {
-        this.player1 = new Player(user1, createEmptyBoard(true), initializeShips(), false, false);
-        this.player2 = new Player(user2, createEmptyBoard(false), initializeShips(), false, false);
+        this.player1 = new Player(user1, createEmptyBoard("player1"), initializeShips("player1"), false, false);
+        this.player2 = new Player(user2, createEmptyBoard("player2"), initializeShips("player2"), false, false);
     }
 }
 

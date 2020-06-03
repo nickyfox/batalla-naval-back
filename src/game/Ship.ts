@@ -7,6 +7,10 @@ export class Ship {
 
     constructor(id: string, length: number) {
         this.id = id;
-        this.pieces = new Array<boolean>(length);
+        let pieces: Array<boolean> = [];
+        for (let i = 0; i < length; i++) {
+            pieces.push(false)
+        }
+        this.pieces = pieces;
     }
 }
