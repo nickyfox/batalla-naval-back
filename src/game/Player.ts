@@ -5,13 +5,13 @@ import {Ship} from "./Ship";
 class Player {
 
     user: User;
-    board: Array<BoardCell>;
-    ships: Array<Ship>;
+    board: BoardCell[];
+    ships: Ship[];
     turn: boolean;
     positionedShips: boolean;
 
 
-    constructor(user: User, board: Array<BoardCell>, ships: Array<Ship>, turn: boolean, positionedShips: boolean) {
+    constructor(user: User, board: BoardCell[], ships: Ship[], turn: boolean, positionedShips: boolean) {
         this.user = user;
         this.board = board;
         this.ships = ships;
