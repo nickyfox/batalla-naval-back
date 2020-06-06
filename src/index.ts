@@ -73,7 +73,30 @@ async function main() {
             console.log("RECEIVE GAME: ", room);
             socket.to(room).emit("update game", game)
         });
+
+        socket.on("shoot cell", (info: {room: string, cell: BoardCell, isPlayer1Shooting: boolean}) => {
+            if(info.isPlayer1Shooting){
+                console.log("SHOOT PLAYER 2: ", info.cell);
+                // game.shootBoard2(info.cell);
+                let newBoard: BoardCell[] = game.player2.board;
+                let index: number = game.player2.board.findIndex((cell) => cell.id === info.cell.id);
+                newBoard[index] = {...newBoard[index], shot: true};
+                game = {...game, player2: {...game.player2, board: newBoard}};
+                console.log(game);
+                io.to(info.room).emit("update game player 2", game.player2)
+            } else {
+                console.log("SHOOT PLAYER 1: ", info.cell);
+                // game.shootBoard1(info.cell);
+                let newBoard: BoardCell[] = game.player1.board;
+                let index: number = game.player1.board.findIndex((cell) => cell.id === info.cell.id);
+                newBoard[index] = {...newBoard[index], shot: true};
+                game = {...game, player1: {...game.player1, board: newBoard}};
+                console.log(game);
+                io.to(info.room).emit("update game player 1", game.player1)
+            }
+        });
     });
+
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
 }
 
