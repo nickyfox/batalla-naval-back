@@ -48,21 +48,26 @@ async function main() {
 
         socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 1: ");
-            game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
-            io.to(info.room).emit("update game player 1", game.player1)
+            // game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
+            game.setPlayer1 = {...game.getPlayer1, positionedShips: true, turn: game.getPlayer2.positionedShips, board: info.board};
+            io.to(info.room).emit("update game player 1", game.getPlayer1)
         });
 
         socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 2: ");
-            game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
-            io.to(info.room).emit("update game player 2", game.player2)
+            // game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
+            game.setPlayer2 = {...game.getPlayer2, positionedShips: true, turn: game.getPlayer1.positionedShips, board: info.board};
+            io.to(info.room).emit("update game player 2", game.getPlayer2)
         });
 
         /**
          * Game update required for the client
          */
         socket.on("update game", (newGame: Game) => {
-            game = {...newGame};
+            game.setPlayer1 = {...newGame.getPlayer1};
+            game.setPlayer2 = {...newGame.getPlayer1};
+            // game.setPlayer1 = newGame.getPlayer1;
+            // game.setPlayer2 = newGame.getPlayer2;
             console.log("UPDATE GAME")
         });
 
@@ -74,32 +79,34 @@ async function main() {
             socket.to(room).emit("update game", game)
         });
 
-        socket.on("shoot cell", (info: {room: string, cell: BoardCell, isPlayer1Shooting: boolean}) => {
-            if(info.isPlayer1Shooting){
-                console.log("SHOOT PLAYER 2: ", info.cell);
-                // game.shootBoard2(info.cell);
-                if(!game.player1.turn){
-                    console.log("NOT PLAYER 1 TURN");
-                    return;
-                }
-                let newBoard: BoardCell[] = game.player2.board;
-                let index: number = game.player2.board.findIndex((cell) => cell.id === info.cell.id);
-                newBoard[index] = {...newBoard[index], shot: true};
-                game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true, board: newBoard}};
-                io.to(info.room).emit("update game", game);
-            } else {
-                console.log("SHOOT PLAYER 1: ", info.cell);
-                // game.shootBoard1(info.cell);
-                if(!game.player2.turn){
-                    console.log("NOT PLAYER 2 TURN");
-                    return;
-                }
-                let newBoard: BoardCell[] = game.player1.board;
-                let index: number = game.player1.board.findIndex((cell) => cell.id === info.cell.id);
-                newBoard[index] = {...newBoard[index], shot: true};
-                game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
-                io.to(info.room).emit("update game", game)
-            }
+        socket.on("shoot cell", (info: {room: string, cell: BoardCell}) => {
+            game.makeShot(info.cell);
+            io.to(info.room).emit("update game", game)
+            // if(info.isPlayer1Shooting){
+            //     console.log("SHOOT PLAYER 2: ", info.cell);
+            //     // game.shootBoard2(info.cell);
+            //     if(!game.player1.turn){
+            //         console.log("NOT PLAYER 1 TURN");
+            //         return;
+            //     }
+            //     let newBoard: BoardCell[] = game.player2.board;
+            //     let index: number = game.player2.board.findIndex((cell) => cell.id === info.cell.id);
+            //     newBoard[index] = {...newBoard[index], shot: true};
+            //     game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true, board: newBoard}};
+            //     io.to(info.room).emit("update game", game);
+            // } else {
+            //     console.log("SHOOT PLAYER 1: ", info.cell);
+            //     // game.shootBoard1(info.cell);
+            //     if(!game.player2.turn){
+            //         console.log("NOT PLAYER 2 TURN");
+            //         return;
+            //     }
+            //     let newBoard: BoardCell[] = game.player1.board;
+            //     let index: number = game.player1.board.findIndex((cell) => cell.id === info.cell.id);
+            //     newBoard[index] = {...newBoard[index], shot: true};
+            //     game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
+            //     io.to(info.room).emit("update game", game)
+            // }
         });
     });
 
