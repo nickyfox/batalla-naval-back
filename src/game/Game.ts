@@ -32,8 +32,8 @@ function initializeShips(player: string): Array<Ship> {
 }
 
 class Game {
-    private player1: Player;
-    private player2: Player;
+    player1: Player;
+    player2: Player;
 
     constructor(user1: User, user2: User) {
         this.player1 = new Player(user1, createEmptyBoard("player1"), initializeShips("player1"), false, false);
@@ -41,30 +41,30 @@ class Game {
     }
 
 
-    get getPlayer1(): Player {
-        return this.player1;
-    }
+    // get getPlayer1(): Player {
+    //     return this.player1;
+    // }
+    //
+    // get getPlayer2(): Player {
+    //     return this.player2;
+    // }
+    //
+    //
+    // set setPlayer1(value: Player) {
+    //     this.player1 = value;
+    // }
+    //
+    // set setPlayer2(value: Player) {
+    //     this.player2 = value;
+    // }
 
-    get getPlayer2(): Player {
-        return this.player2;
-    }
-
-
-    set setPlayer1(value: Player) {
-        this.player1 = value;
-    }
-
-    set setPlayer2(value: Player) {
-        this.player2 = value;
-    }
-
-    public makeShot(cell: BoardCell): void {
+    public makeShot: (cell: BoardCell) => void = (cell: BoardCell) => {
         if(this.player1.turn){
             this.shootBoard2(cell) && this.changePlayersTurns();
         } else {
             this.shootBoard1(cell) && this.changePlayersTurns();
         }
-    }
+    };
 
     private shootBoard1(shotCell: BoardCell): boolean {
         // let newBoard: BoardCell[] = [...this.player1.board];

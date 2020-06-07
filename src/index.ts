@@ -49,25 +49,25 @@ async function main() {
         socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 1: ");
             // game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
-            game.setPlayer1 = {...game.getPlayer1, positionedShips: true, turn: game.getPlayer2.positionedShips, board: info.board};
-            io.to(info.room).emit("update game player 1", game.getPlayer1)
+            game.player1 = {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board};
+            io.to(info.room).emit("update game player 1", game.player1)
         });
 
         socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 2: ");
             // game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
-            game.setPlayer2 = {...game.getPlayer2, positionedShips: true, turn: game.getPlayer1.positionedShips, board: info.board};
-            io.to(info.room).emit("update game player 2", game.getPlayer2)
+            game.player2 = {...game.player2, positionedShips: true, turn: game.player1.positionedShips, board: info.board};
+            io.to(info.room).emit("update game player 2", game.player2)
         });
 
         /**
          * Game update required for the client
          */
         socket.on("update game", (newGame: Game) => {
-            game.setPlayer1 = {...newGame.getPlayer1};
-            game.setPlayer2 = {...newGame.getPlayer1};
-            // game.setPlayer1 = newGame.getPlayer1;
-            // game.setPlayer2 = newGame.getPlayer2;
+            game.player1 = {...newGame.player1};
+            game.player1 = {...newGame.player2};
+            // game.player1 = newGame.player1;
+            // game.player2 = newGame.player2;
             console.log("UPDATE GAME")
         });
 
