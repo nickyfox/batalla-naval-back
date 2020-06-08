@@ -2,8 +2,9 @@ import { App } from "./app";
 import http from "http";
 import Game from "./game/Game";
 const socketio = require("socket.io");
-import {findUserById} from "./services/user.services"
+import {findUserById, saveMatchHistory} from "./services/user.services"
 import {BoardCell} from "./game/BoardCell";
+import {addMatchHistory} from "./controllers/users.controller";
 
 async function main() {
     const port = process.env.PORT || "8000";
@@ -42,6 +43,11 @@ async function main() {
                 room: `game_room_${users.userNotWaiting}_${users.userWaiting}`,
                 game: game
             });
+        });
+
+        socket.on("leave room", (info: {room: string}) => {
+            console.log("LEFT ROOM");
+            socket.leave(info.room);
         });
 
         // ----------- GAME MESSAGES ------------------
@@ -86,6 +92,12 @@ async function main() {
                 let index: number = game.player2.board.findIndex((cell) => cell.id === info.cell.id);
                 newBoard[index] = {...newBoard[index], shot: true};
                 game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true, board: newBoard}};
+
+                if(game.player2.board.filter(cell => cell.occupied).length === game.player2.board.filter(cell => cell.shot).length){
+                    saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
+                        io.to(info.room).emit("player 1 won", {player1: game.player1, player2: game.player2});
+                    });
+                }
                 io.to(info.room).emit("update game", game);
             } else {
                 console.log("SHOOT PLAYER 1: ", info.cell);
@@ -98,6 +110,12 @@ async function main() {
                 let index: number = game.player1.board.findIndex((cell) => cell.id === info.cell.id);
                 newBoard[index] = {...newBoard[index], shot: true};
                 game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
+
+                if(game.player1.board.filter(cell => cell.occupied).length === game.player1.board.filter(cell => cell.shot).length){
+                    saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
+                        io.to(info.room).emit("player 2 won", {player1: game.player1, player2: game.player2});
+                    });
+                }
                 io.to(info.room).emit("update game", game)
             }
         });

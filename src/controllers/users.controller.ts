@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import {connect} from "../database";
 import { User } from "../models/User";
-import {findUserById, saveUser} from "../services/user.services";
+import {findUserById, saveMatchHistory, saveUser} from "../services/user.services";
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {
     const conn = await connect();
@@ -66,5 +66,22 @@ export async function addUserWaiting(req: Request, res: Response) {
     }
     return res.json({
         message: "User added"
+    })
+}
+
+export async function getMatchHistory(req: Request, res: Response) {
+    const winner_id = req.params.winnerId;
+    const loser_id = req.params.loserId;
+    const conn = await connect();
+    const history = await conn.query("SELECT * FROM match_history WHERE winner_id = ? AND loser_id = ?", [winner_id, loser_id]);
+    return res.json(history[0]);
+}
+
+export async function addMatchHistory(req: Request, res: Response) {
+    const winnerId = {winner_id: req.params.winnerId};
+    const loserId = {loser_id: req.params.loserId};
+    await saveMatchHistory(winnerId, loserId);
+    return res.json({
+        message: "Match history added"
     })
 }
