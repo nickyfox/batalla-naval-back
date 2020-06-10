@@ -54,12 +54,20 @@ async function main() {
 
         socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 1: ");
+            if(info.board.filter(cells => cells.occupied).length === 0) {
+                socket.emit("no positioned ships");
+                return;
+            }
             game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
             io.to(info.room).emit("update game player 1", game.player1)
         });
 
         socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>}) => {
             console.log("send board with placed ships for player 2: ");
+            if(info.board.filter(cells => cells.occupied).length === 0) {
+                socket.emit("no positioned ships");
+                return;
+            }
             game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
             io.to(info.room).emit("update game player 2", game.player2)
         });
@@ -90,6 +98,10 @@ async function main() {
                 }
                 let newBoard: BoardCell[] = game.player2.board;
                 let index: number = game.player2.board.findIndex((cell) => cell.id === info.cell.id);
+                if(newBoard[index].shot){
+                    socket.emit("already shot cell");
+                    return;
+                }
                 newBoard[index] = {...newBoard[index], shot: true};
                 game = {
                     ...game,
@@ -113,6 +125,10 @@ async function main() {
                 }
                 let newBoard: BoardCell[] = game.player1.board;
                 let index: number = game.player1.board.findIndex((cell) => cell.id === info.cell.id);
+                if(newBoard[index].shot){
+                    socket.emit("already shot cell");
+                    return;
+                }
                 newBoard[index] = {...newBoard[index], shot: true};
                 game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
 
