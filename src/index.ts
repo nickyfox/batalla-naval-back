@@ -141,6 +141,15 @@ async function main() {
                 io.to(info.room).emit("update game", game)
             }
         });
+
+        socket.on("turn time finished", (info: {room: string, isPlayer1: boolean}) => {
+            if(info.isPlayer1) {
+                game = {...game, player1: {...game.player1, turn: false, countdown: 0}, player2: {...game.player2, turn: true, countdown: 10000}}
+            } else {
+                game = {...game, player1: {...game.player1, turn: true, countdown: 10000}, player2: {...game.player2, turn: false, countdown: 0}}
+            }
+            io.to(info.room).emit("update game", game)
+        })
     });
 
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
