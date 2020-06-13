@@ -5,6 +5,7 @@ const socketio = require("socket.io");
 import {findUserById, saveMatchHistory} from "./services/user.services"
 import {BoardCell} from "./game/BoardCell";
 import {addMatchHistory} from "./controllers/users.controller";
+import {Ship} from "./game/Ship";
 
 async function main() {
     const port = process.env.PORT || "8000";
@@ -52,20 +53,30 @@ async function main() {
 
         // ----------- GAME MESSAGES ------------------
 
-        socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>}) => {
+        socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>, ships: Ship[]}) => {
             console.log("send board with placed ships for player 1: ");
             if(info.board.filter(cells => cells.occupied).length === 0) {
                 socket.emit("no positioned ships");
                 return;
             }
+            if(info.ships.length !== 0){
+                socket.emit("not positioned all ships");
+                return;
+            }
+
             game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
             io.to(info.room).emit("update game player 1", game.player1)
         });
 
-        socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>}) => {
+        socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>, ships: Ship[]}) => {
             console.log("send board with placed ships for player 2: ");
             if(info.board.filter(cells => cells.occupied).length === 0) {
                 socket.emit("no positioned ships");
+                return;
+            }
+
+            if(info.ships.length !== 0){
+                socket.emit("not positioned all ships");
                 return;
             }
             game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
@@ -144,9 +155,9 @@ async function main() {
 
         socket.on("turn time finished", (info: {room: string, isPlayer1: boolean}) => {
             if(info.isPlayer1) {
-                game = {...game, player1: {...game.player1, turn: false, countdown: 0}, player2: {...game.player2, turn: true, countdown: 10000}}
+                game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true}}
             } else {
-                game = {...game, player1: {...game.player1, turn: true, countdown: 10000}, player2: {...game.player2, turn: false, countdown: 0}}
+                game = {...game, player1: {...game.player1, turn: true}, player2: {...game.player2, turn: false}}
             }
             io.to(info.room).emit("update game", game)
         })

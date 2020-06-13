@@ -36,8 +36,8 @@ class Game {
     player2: Player;
 
     constructor(user1: User, user2: User) {
-        this.player1 = new Player(user1, createEmptyBoard("player1"), initializeShips("player1"), false, 0, false);
-        this.player2 = new Player(user2, createEmptyBoard("player2"), initializeShips("player2"), false, 0, false);
+        this.player1 = new Player(user1, createEmptyBoard("player1"), initializeShips("player1"), false, false);
+        this.player2 = new Player(user2, createEmptyBoard("player2"), initializeShips("player2"), false, false);
     }
 }
 
