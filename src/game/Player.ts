@@ -1,7 +1,6 @@
 import {User} from "../models/User";
 import {BoardCell} from "./BoardCell";
 import {Ship} from "./Ship";
-import Timeout = NodeJS.Timeout;
 
 class Player {
 

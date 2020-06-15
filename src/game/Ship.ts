@@ -3,16 +3,12 @@
  */
 export class Ship {
     id: string;
-    pieces: boolean[];
     content: string;
+    length: number;
 
     constructor(id: string, content: string, length: number) {
         this.id = id;
         this.content = content;
-        let pieces: boolean[] = [];
-        for (let i = 0; i < length; i++) {
-            pieces.push(false)
-        }
-        this.pieces = pieces;
+        this.length = length;
     }
 }
