@@ -87,8 +87,24 @@ export async function addMatchHistory(req: Request, res: Response) {
 }
 
 export async function getPlayerMatchHistory(req: Request, res: Response){
-    const player_id = req.params.playerId;
+    const player_id = req.params.userId;
     const conn = await connect();
-    const history = await conn.query("SELECT * FROM match_history WHERE winner_id = ? OR loser_id = ?", [player_id]);
-    return res.json(history)
+    const [winnerRows]: any[] = await conn.query("SELECT * FROM match_history WHERE winner_id = ?", [player_id]);
+    const [loserRows]: any[] = await conn.query("SELECT * FROM match_history WHERE loser_id = ?", [player_id]);
+
+    let beautifulWinnerRows: any[] = await Promise.all(winnerRows.map(async (row: any) => {
+        return {
+            user: await findUserById(row.loser_id),
+            won: true
+        }
+    }));
+
+    let beautifulLoserRows: any[] = await Promise.all(loserRows.map(async (row: any) => {
+        return {
+            user: await findUserById(row.winner_id),
+            won: false
+        }
+    }));
+
+    return res.json([...beautifulWinnerRows, ...beautifulLoserRows])
 }

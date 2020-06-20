@@ -1,8 +1,9 @@
 import express, {Application} from 'express';
 import cors from "cors"
 import morgan from "morgan";
-import UsersRoutes from "./routes/users.routes"
-import AuthRoutes from "./routes/auth.routes"
+import UsersRoutes from "./routes/users.routes";
+import AuthRoutes from "./routes/auth.routes";
+
 export class App {
 
     public app: Application;
@@ -20,7 +21,8 @@ export class App {
 
     middlewares() {
         this.app.use(morgan("dev"));
-        this.app.use(express.json());
-        this.app.use(cors())
+        this.app.use(express.json({limit: '50mb'}));
+        this.app.use(cors());
+        // this.app.use(express.bodyParser({limit: '50mb'}));
     }
 }

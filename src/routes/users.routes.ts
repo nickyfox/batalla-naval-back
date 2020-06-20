@@ -35,7 +35,7 @@ router.route("/waiting/delete/:id")
 router.route("/history/:winnerId/:loserId")
     .get(getMatchHistory)
     .post(addMatchHistory);
-router.route("/history/playerID")
+router.route("/history/:userId")
     .get(getPlayerMatchHistory);
 
 export default router;
