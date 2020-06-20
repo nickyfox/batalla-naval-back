@@ -6,7 +6,7 @@ import {
     deleteUser,
     updateUser,
     getUsersWaiting,
-    addUserWaiting, deleteUserWaiting, getMatchHistory, addMatchHistory
+    addUserWaiting, deleteUserWaiting, getMatchHistory, addMatchHistory, getPlayerMatchHistory
 } from "../controllers/users.controller";
 
 const router = Router();
@@ -35,5 +35,7 @@ router.route("/waiting/delete/:id")
 router.route("/history/:winnerId/:loserId")
     .get(getMatchHistory)
     .post(addMatchHistory);
+router.route("/history/playerID")
+    .get(getPlayerMatchHistory);
 
 export default router;

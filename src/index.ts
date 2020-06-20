@@ -59,10 +59,10 @@ async function main() {
                 socket.emit("no positioned ships");
                 return;
             }
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
 
             game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
             io.to(info.room).emit("update game player 1", game.player1)
@@ -74,11 +74,11 @@ async function main() {
                 socket.emit("no positioned ships");
                 return;
             }
-
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            //
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
             game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
             io.to(info.room).emit("update game player 2", game.player2)
         });

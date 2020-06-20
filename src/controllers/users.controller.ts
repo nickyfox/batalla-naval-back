@@ -85,3 +85,10 @@ export async function addMatchHistory(req: Request, res: Response) {
         message: "Match history added"
     })
 }
+
+export async function getPlayerMatchHistory(req: Request, res: Response){
+    const player_id = req.params.playerId;
+    const conn = await connect();
+    const history = await conn.query("SELECT * FROM match_history WHERE winner_id = ? OR loser_id = ?", [player_id]);
+    return res.json(history)
+}
