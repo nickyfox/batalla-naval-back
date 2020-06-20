@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import {connect} from "../database";
 import { User } from "../models/User";
-import {findUserById, saveMatchHistory, saveUser} from "../services/user.services";
+import {findUserById, findUserByIdBeautiful, saveMatchHistory, saveUser} from "../services/user.services";
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {
     const conn = await connect();
@@ -94,14 +94,14 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
 
     let beautifulWinnerRows: any[] = await Promise.all(winnerRows.map(async (row: any) => {
         return {
-            user: await findUserById(row.loser_id),
+            user: await findUserByIdBeautiful(row.loser_id),
             won: true
         }
     }));
 
     let beautifulLoserRows: any[] = await Promise.all(loserRows.map(async (row: any) => {
         return {
-            user: await findUserById(row.winner_id),
+            user: await findUserByIdBeautiful(row.winner_id),
             won: false
         }
     }));
