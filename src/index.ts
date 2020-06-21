@@ -6,6 +6,7 @@ import {findUserById, saveMatchHistory} from "./services/user.services"
 import {BoardCell} from "./game/BoardCell";
 import {addMatchHistory} from "./controllers/users.controller";
 import {Ship} from "./game/Ship";
+import {User} from "./models/User";
 
 async function main() {
     const port = process.env.PORT || "8000";
@@ -160,6 +161,19 @@ async function main() {
                 game = {...game, player1: {...game.player1, turn: true}, player2: {...game.player2, turn: false}}
             }
             io.to(info.room).emit("update game", game)
+        });
+
+        socket.on("player wants rematch", (info: {room: string, isPlayer1: boolean}) => {
+            if(info.isPlayer1) {
+                io.emit("player 1 wants rematch")
+            } else {
+                io.emit("player 2 wants rematch")
+            }
+        });
+
+        socket.on("rematch", (info: {room: string, user1: User, user2: User}) => {
+            game = new Game(info.user1, info.user2);
+            io.emit("update game", game);
         })
     });
 
