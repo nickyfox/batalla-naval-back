@@ -174,6 +174,20 @@ async function main() {
         socket.on("rematch", (info: {room: string, user1: User, user2: User}) => {
             game = new Game(info.user1, info.user2);
             io.to(info.room).emit("restart game", game);
+        });
+
+        socket.on("quit game", (info: {room: string, isPlayer1: boolean}) => {
+            if(info.isPlayer1){
+                socket.leave(info.room);
+                saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
+                    io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
+                });
+            } else {
+                socket.leave(info.room);
+                saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
+                    io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
+                });
+            }
         })
     });
 
