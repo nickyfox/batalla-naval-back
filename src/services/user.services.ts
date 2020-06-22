@@ -29,8 +29,9 @@ export async function saveUser(user: User) {
 
 export async function saveMatchHistory(winner_id: {winner_id: string | undefined}, loser_id: {loser_id: string | undefined}){
     const conn = await connect();
+    const date = new Date().getTime();
     try {
-        await conn.query("INSERT INTO match_history SET ?, ?", [winner_id, loser_id]);
+        await conn.query("INSERT INTO match_history SET ?, ?, date=" + date, [winner_id, loser_id]);
     }catch (e) {
         console.log(e)
     }

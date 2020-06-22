@@ -95,6 +95,7 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
     let beautifulWinnerRows: any[] = await Promise.all(winnerRows.map(async (row: any) => {
         return {
             user: await findUserByIdBeautiful(row.loser_id),
+            date: row.date,
             won: true
         }
     }));
@@ -102,6 +103,7 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
     let beautifulLoserRows: any[] = await Promise.all(loserRows.map(async (row: any) => {
         return {
             user: await findUserByIdBeautiful(row.winner_id),
+            date: row.date,
             won: false
         }
     }));
