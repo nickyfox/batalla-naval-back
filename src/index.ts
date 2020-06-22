@@ -165,15 +165,15 @@ async function main() {
 
         socket.on("player wants rematch", (info: {room: string, isPlayer1: boolean}) => {
             if(info.isPlayer1) {
-                io.emit("player 1 wants rematch")
+                io.to(info.room).emit("player 1 wants rematch")
             } else {
-                io.emit("player 2 wants rematch")
+                io.to(info.room).emit("player 2 wants rematch")
             }
         });
 
         socket.on("rematch", (info: {room: string, user1: User, user2: User}) => {
             game = new Game(info.user1, info.user2);
-            io.emit("update game", game);
+            io.to(info.room).emit("restart game", game);
         })
     });
 
