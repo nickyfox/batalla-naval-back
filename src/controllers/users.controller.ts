@@ -108,5 +108,11 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         }
     }));
 
-    return res.json([...beautifulWinnerRows, ...beautifulLoserRows])
+    let result: any[] =  [...beautifulWinnerRows, ...beautifulLoserRows].sort((row1: any, row2: any) => {
+        return row1.date - row2.date
+    });
+
+    result = result.slice(0, 4);
+    console.log("RESULT: ", result);
+    return res.json([...result])
 }
