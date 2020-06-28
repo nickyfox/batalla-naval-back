@@ -13,6 +13,11 @@ const letterMapping: any = {
     6: 'g',
 };
 
+export interface ShootCellResponse {
+    shot: boolean;
+    alreadyShotCell: boolean;
+}
+
 function createEmptyBoard(player: string): Array<BoardCell> {
     let board: BoardCell[] = [];
     for (let i = 0; i < 6; i++) {
@@ -42,6 +47,45 @@ class Game {
         this.player1 = new Player(user1, createEmptyBoard("player1"), initializeShips("player1"), false, false);
         this.player2 = new Player(user2, createEmptyBoard("player2"), initializeShips("player2"), false, false);
     }
+
+    // isPlayerTurn = (isPlayer1Shooting: boolean): boolean => {
+    //     if(isPlayer1Shooting) {
+    //         return this.player1.turn;
+    //     } else {
+    //         return this.player2.turn;
+    //     }
+    // };
+    //
+    // checkIfLost = (player: Player): boolean => {
+    //     return player.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0;
+    // };
+    //
+    // shootCell = (cell: BoardCell, isPlayer1Shooting: boolean): ShootCellResponse => {
+    //     if(this.player1.turn) {
+    //         if(isPlayer1Shooting) {
+    //             return this._makeShot(this.player2, cell);
+    //         }else {
+    //             return {shot: false, alreadyShotCell: false};
+    //         }
+    //     } else {
+    //         if(!isPlayer1Shooting) {
+    //             return this._makeShot(this.player1, cell);
+    //         }else {
+    //             return {shot: false, alreadyShotCell: false};
+    //         }
+    //     }
+    // };
+    //
+    // _makeShot = (player: Player, cellToShoot: BoardCell): ShootCellResponse => {
+    //     let newBoard: BoardCell[] = player.board;
+    //     let index: number = player.board.findIndex((cell: BoardCell) => cell.id === cellToShoot.id);
+    //     if(newBoard[index].shot) {
+    //         return {shot: false, alreadyShotCell: true};
+    //     }
+    //     newBoard[index] = {...newBoard[index], shot: true};
+    //     player.board = newBoard;
+    //     return {shot: true, alreadyShotCell: false};
+    // }
 }
 
 export default Game
