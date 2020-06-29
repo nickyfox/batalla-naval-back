@@ -1,11 +1,10 @@
 import {Request, Response} from "express";
-import {connect} from "../database";
+import {connection} from "../database";
 import { User } from "../models/User";
 import {findUserById, findUserByIdBeautiful, saveMatchHistory, saveUser} from "../services/user.services";
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {
-    const conn = await connect();
-    const users = await conn.query("SELECT * FROM users");
+    const users = await connection.query("SELECT * FROM users");
     return res.json(users[0]);
 }
 
@@ -24,8 +23,7 @@ export async function createUser(req: Request, res: Response) {
 
 export async function deleteUser(req: Request, res: Response) {
     const id = req.params.id;
-    const conn = await connect();
-    await conn.query("DELETE FROM users WHERE id = ?", [id]);
+    await connection.query("DELETE FROM users WHERE id = ?", [id]);
     return res.json({
         message: "User deleted"
     })
@@ -34,23 +32,20 @@ export async function deleteUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
     const id = req.params.id;
     const updatedUser: User = req.body;
-    const conn = await connect();
-    await conn.query("UPDATE users SET ? WHERE id = ?", [updatedUser, id]);
+    await connection.query("UPDATE users SET ? WHERE id = ?", [updatedUser, id]);
     return res.json({
         message: "User updated"
     })
 }
 
 export async function getUsersWaiting(req: Request, res: Response): Promise<Response> {
-    const conn = await connect();
-    const users = await conn.query("SELECT * FROM users_waiting");
+    const users = await connection.query("SELECT * FROM users_waiting");
     return res.json(users[0]);
 }
 
 export async function deleteUserWaiting(req: Request, res: Response) {
-    const conn = await connect();
     const user_id = req.params.id;
-    await conn.query("DELETE FROM users_waiting WHERE user_id = ?", [user_id]);
+    await connection.query("DELETE FROM users_waiting WHERE user_id = ?", [user_id]);
     return res.json({
         message: "User deleted"
     })
@@ -58,9 +53,8 @@ export async function deleteUserWaiting(req: Request, res: Response) {
 
 export async function addUserWaiting(req: Request, res: Response) {
     const user_id = {user_id: req.body.id};
-    const conn = await connect();
     try {
-        await conn.query("INSERT INTO users_waiting SET ?", [user_id]);
+        await connection.query("INSERT INTO users_waiting SET ?", [user_id]);
     }catch (e) {
         console.log(e)
     }
@@ -72,8 +66,7 @@ export async function addUserWaiting(req: Request, res: Response) {
 export async function getMatchHistory(req: Request, res: Response) {
     const winner_id = req.params.winnerId;
     const loser_id = req.params.loserId;
-    const conn = await connect();
-    const history = await conn.query("SELECT * FROM match_history WHERE winner_id = ? AND loser_id = ?", [winner_id, loser_id]);
+    const history = await connection.query("SELECT * FROM match_history WHERE winner_id = ? AND loser_id = ?", [winner_id, loser_id]);
     return res.json(history[0]);
 }
 
@@ -88,9 +81,8 @@ export async function addMatchHistory(req: Request, res: Response) {
 
 export async function getPlayerMatchHistory(req: Request, res: Response){
     const player_id = req.params.userId;
-    const conn = await connect();
-    const [winnerRows]: any[] = await conn.query("SELECT * FROM match_history WHERE winner_id = ?", [player_id]);
-    const [loserRows]: any[] = await conn.query("SELECT * FROM match_history WHERE loser_id = ?", [player_id]);
+    const [winnerRows]: any[] = await connection.query("SELECT * FROM match_history WHERE winner_id = ?", [player_id]);
+    const [loserRows]: any[] = await connection.query("SELECT * FROM match_history WHERE loser_id = ?", [player_id]);
 
     let beautifulWinnerRows: any[] = await Promise.all(winnerRows.map(async (row: any) => {
         return {

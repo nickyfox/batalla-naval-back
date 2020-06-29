@@ -26,7 +26,7 @@ async function main() {
             })
         });
 
-        socket.on("only_join_game_room", (info: any) => {
+        socket.on("only_join_game_room", (info: {game: Game, userNotWaiting: string, userWaiting: string}) => {
             console.log("ONLY JOIN GAME ROOM");
             game = info.game;
             socket.join(`game_room_${info.userNotWaiting}_${info.userWaiting}`)
@@ -65,7 +65,10 @@ async function main() {
             //     return;
             // }
 
-            game = {...game, player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}};
+            game = {
+                ...game,
+                player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}
+            };
             io.to(info.room).emit("update game player 1", game.player1)
         });
 
@@ -80,7 +83,10 @@ async function main() {
             //     socket.emit("not positioned all ships");
             //     return;
             // }
-            game = {...game, player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}};
+            game = {
+                ...game,
+                player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}
+            };
             io.to(info.room).emit("update game player 2", game.player2)
         });
 
@@ -102,36 +108,6 @@ async function main() {
 
         socket.on("shoot cell", (info: {room: string, cell: BoardCell, isPlayer1Shooting: boolean}) => {
 
-            // if (!game.isPlayerTurn(info.isPlayer1Shooting)) {
-            //     console.log("NOT PLAYER 1 TURN");
-            //     socket.emit("not your turn");
-            //     return;
-            // }
-            //
-            // const response: ShootCellResponse = game.shootCell(info.cell, info.isPlayer1Shooting);
-            //
-            // if(response.alreadyShotCell) {
-            //     socket.emit("already shot cell");
-            //     return;
-            // }
-            // if(response.shot) {
-            //     if(info.isPlayer1Shooting) {
-            //         if (game.checkIfLost(game.player2)) {
-            //             console.log("PLAYER 1 WON");
-            //             saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
-            //                 io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
-            //             });
-            //         } else {
-            //             if (game.checkIfLost(game.player1)) {
-            //                 console.log("PLAYER 2 WON");
-            //                 saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
-            //                     io.to(info.room).emit("player 1 won", {winner: game.player2, loser: game.player1});
-            //                 });
-            //             }
-            //         }
-            //     }
-            // }
-            //     io.to(info.room).emit("update game", game);
             if(info.isPlayer1Shooting){
                 console.log("SHOOT PLAYER 2: ", info.cell);
                 if (!game.player1.turn) {
@@ -173,7 +149,11 @@ async function main() {
                     return;
                 }
                 newBoard[index] = {...newBoard[index], shot: true};
-                game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
+                game = {
+                    ...game,
+                    player2: {...game.player2, turn: false},
+                    player1: {...game.player1, turn: true, board: newBoard}
+                };
 
                 if(game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");
@@ -231,7 +211,11 @@ async function main() {
                 const index = newBoard.findIndex(cell => cell.id === shotCell.id);
                 newBoard[index] = {...shotCell, shot: true};
 
-                game = {...game, player2: {...game.player2, turn: false}, player1: {...game.player1, turn: true, board: newBoard}};
+                game = {
+                    ...game,
+                    player2: {...game.player2, turn: false},
+                    player1: {...game.player1, turn: true, board: newBoard}
+                };
 
                 if(game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");

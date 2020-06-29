@@ -1,8 +1,8 @@
-import {createPool} from "mysql2/promise";
+import {createPool, Pool} from "mysql2/promise";
 
 
-export async function connect() {
-    const connection = await createPool({
+function connect() {
+    return createPool({
         host: 'localhost',
         user: 'root',
         password: 'password',
@@ -10,5 +10,6 @@ export async function connect() {
         database: 'batalla_naval',
         connectionLimit: 10
     });
-    return connection;
 }
+
+export const connection: Pool = connect();

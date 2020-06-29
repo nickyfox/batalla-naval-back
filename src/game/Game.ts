@@ -48,7 +48,7 @@ class Game {
         this.player2 = new Player(user2, createEmptyBoard("player2"), initializeShips("player2"), false, false);
     }
 
-    // isPlayerTurn = (isPlayer1Shooting: boolean): boolean => {
+    // public isPlayerTurn = (isPlayer1Shooting: boolean): boolean => {
     //     if(isPlayer1Shooting) {
     //         return this.player1.turn;
     //     } else {
@@ -56,11 +56,11 @@ class Game {
     //     }
     // };
     //
-    // checkIfLost = (player: Player): boolean => {
+    // public checkIfLost = (player: Player): boolean => {
     //     return player.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0;
     // };
     //
-    // shootCell = (cell: BoardCell, isPlayer1Shooting: boolean): ShootCellResponse => {
+    // public shootCell = (cell: BoardCell, isPlayer1Shooting: boolean): ShootCellResponse => {
     //     if(this.player1.turn) {
     //         if(isPlayer1Shooting) {
     //             return this._makeShot(this.player2, cell);
@@ -76,7 +76,7 @@ class Game {
     //     }
     // };
     //
-    // _makeShot = (player: Player, cellToShoot: BoardCell): ShootCellResponse => {
+    // private _makeShot(player: Player, cellToShoot: BoardCell): ShootCellResponse {
     //     let newBoard: BoardCell[] = player.board;
     //     let index: number = player.board.findIndex((cell: BoardCell) => cell.id === cellToShoot.id);
     //     if(newBoard[index].shot) {
