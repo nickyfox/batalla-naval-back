@@ -1,10 +1,9 @@
 import { App } from "./app";
 import http from "http";
-import Game, {ShootCellResponse} from "./game/Game";
+import Game from "./game/Game";
 const socketio = require("socket.io");
 import {findUserById, saveMatchHistory} from "./services/user.services"
 import {BoardCell} from "./game/BoardCell";
-import {addMatchHistory} from "./controllers/users.controller";
 import {Ship} from "./game/Ship";
 import {User} from "./models/User";
 
@@ -60,10 +59,10 @@ async function main() {
                 socket.emit("no positioned ships");
                 return;
             }
-            // if(info.ships.length !== 0){
-            //     socket.emit("not positioned all ships");
-            //     return;
-            // }
+            if(info.ships.length !== 0){
+                socket.emit("not positioned all ships");
+                return;
+            }
 
             game = {
                 ...game,
@@ -78,11 +77,12 @@ async function main() {
                 socket.emit("no positioned ships");
                 return;
             }
-            //
-            // if(info.ships.length !== 0){
-            //     socket.emit("not positioned all ships");
-            //     return;
-            // }
+
+            if(info.ships.length !== 0){
+                socket.emit("not positioned all ships");
+                return;
+            }
+
             game = {
                 ...game,
                 player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}
