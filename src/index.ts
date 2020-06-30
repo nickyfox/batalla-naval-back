@@ -34,7 +34,7 @@ async function main() {
         socket.on("join_game_room_then_send", async (users: any) => {
             const user1: any = await findUserById(users.userWaiting);
             const user2: any = await findUserById(users.userNotWaiting);
-            game = new Game({...user1[0]}, {...user2[0]});
+            game = new Game({...user1[0]}, {...user2[0]}, new Date().getTime());
 
             console.log("JOIN GAME ROOM FOR ", users);
             socket.join(`game_room_${users.userNotWaiting}_${users.userWaiting}`);
@@ -130,7 +130,7 @@ async function main() {
 
                 if (game.player2.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 1 WON");
-                    saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
+                    saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                     });
                 }
@@ -157,7 +157,7 @@ async function main() {
 
                 if(game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");
-                    saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
+                    saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                     });
                 }
@@ -191,7 +191,7 @@ async function main() {
 
                 if (game.player2.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 1 WON");
-                    saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
+                    saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                     });
                 }
@@ -219,7 +219,7 @@ async function main() {
 
                 if(game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");
-                    saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
+                    saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                     });
                 }
@@ -245,19 +245,19 @@ async function main() {
         });
 
         socket.on("rematch", (info: {room: string, user1: User, user2: User}) => {
-            game = new Game(info.user1, info.user2);
+            game = new Game(info.user1, info.user2, new Date().getTime());
             io.to(info.room).emit("restart game", game);
         });
 
         socket.on("quit game", (info: {room: string, isPlayer1: boolean}) => {
             if(info.isPlayer1){
                 socket.leave(info.room);
-                saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}).then(() => {
+                saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                 });
             } else {
                 socket.leave(info.room);
-                saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}).then(() => {
+                saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                 });
             }

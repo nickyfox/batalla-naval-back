@@ -73,7 +73,7 @@ export async function getMatchHistory(req: Request, res: Response) {
 export async function addMatchHistory(req: Request, res: Response) {
     const winnerId = {winner_id: req.params.winnerId};
     const loserId = {loser_id: req.params.loserId};
-    await saveMatchHistory(winnerId, loserId);
+    await saveMatchHistory(winnerId, loserId, new Date().getTime());
     return res.json({
         message: "Match history added"
     })
@@ -88,7 +88,8 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         return {
             user: await findUserByIdBeautiful(row.loser_id),
             date: row.date,
-            won: true
+            won: true,
+            time: row.time
         }
     }));
 
@@ -96,7 +97,8 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         return {
             user: await findUserByIdBeautiful(row.winner_id),
             date: row.date,
-            won: false
+            won: false,
+            time: row.time
         }
     }));
 

@@ -24,10 +24,11 @@ export async function saveUser(user: User) {
 }
 
 
-export async function saveMatchHistory(winner_id: {winner_id: string | undefined}, loser_id: {loser_id: string | undefined}){
+export async function saveMatchHistory(winner_id: {winner_id: string | undefined}, loser_id: {loser_id: string | undefined}, gameInitialTime: number){
     const date = new Date().getTime();
+    const time = date - gameInitialTime;
     try {
-        await connection.query("INSERT INTO match_history SET ?, ?, date=" + date, [winner_id, loser_id]);
+        await connection.query("INSERT INTO match_history SET ?, ?, date=" + date + ", time=" + time, [winner_id, loser_id]);
     }catch (e) {
         console.log(e)
     }
