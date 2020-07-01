@@ -106,7 +106,7 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         return row1.date - row2.date
     });
 
-    result = result.slice(0, 5);
+    result = result.slice(Math.max(result.length - 5, 0));
     console.log("RESULT: ", result);
     return res.json([...result])
 }
