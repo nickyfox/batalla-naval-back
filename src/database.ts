@@ -5,7 +5,7 @@ function connect() {
     return createPool({
         host: 'localhost',
         user: 'root',
-        password: 'new-password',
+        password: 'password',
         port: 3306,
         database: 'batalla_naval',
         connectionLimit: 10
