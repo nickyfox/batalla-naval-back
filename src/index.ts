@@ -244,8 +244,8 @@ async function main() {
             }
         });
 
-        socket.on("rematch", (info: {room: string, user1: User, user2: User}) => {
-            game = new Game(info.user1, info.user2, new Date().getTime());
+        socket.on("rematch", (info: {room: string}) => {
+            game = new Game(game.player1.user, game.player2.user, new Date().getTime());
             io.to(info.room).emit("restart game", game);
         });
 
