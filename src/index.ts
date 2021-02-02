@@ -55,14 +55,14 @@ async function main() {
 
         socket.on('send board with placed ships for player 1', (info: {room: string, board: Array<BoardCell>, ships: Ship[]}) => {
             console.log("send board with placed ships for player 1: ");
-            if(info.board.filter(cells => cells.occupied).length === 0) {
-                socket.emit("no positioned ships");
-                return;
-            }
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            // if(info.board.filter(cells => cells.occupied).length === 0) {
+            //     socket.emit("no positioned ships");
+            //     return;
+            // }
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
 
             game = {
                 ...game,
@@ -73,15 +73,15 @@ async function main() {
 
         socket.on('send board with placed ships for player 2', (info: {room: string, board: Array<BoardCell>, ships: Ship[]}) => {
             console.log("send board with placed ships for player 2: ");
-            if(info.board.filter(cells => cells.occupied).length === 0) {
-                socket.emit("no positioned ships");
-                return;
-            }
-
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            // if(info.board.filter(cells => cells.occupied).length === 0) {
+            //     socket.emit("no positioned ships");
+            //     return;
+            // }
+            //
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
 
             game = {
                 ...game,
