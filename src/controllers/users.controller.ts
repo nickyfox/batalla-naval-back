@@ -102,11 +102,18 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         }
     }));
 
-    let result: any[] =  [...beautifulWinnerRows, ...beautifulLoserRows].sort((row1: any, row2: any) => {
-        return row1.date - row2.date
-    });
+    const aux = winnerRows.length + loserRows.length;
+    const division = aux !== 0 ? aux : 1 ;
 
-    result = result.slice(Math.max(result.length - 5, 0));
+    // {wins: any[], losses: any[]}
+    let result: { winrate: number, history: any[] } = {
+        winrate: (winnerRows.length / division) * 100,
+        history: [...beautifulWinnerRows, ...beautifulLoserRows].sort((row1: any, row2: any) => {
+            return row1.date - row2.date
+        })
+    };
+
+    result = {...result, history: result.history.slice(Math.max(result.history.length - 5, 0))};
     console.log("RESULT: ", result);
-    return res.json([...result])
+    return res.json(result)
 }

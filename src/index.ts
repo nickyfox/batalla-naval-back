@@ -59,10 +59,10 @@ async function main() {
                 socket.emit("no positioned ships");
                 return;
             }
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
 
             game = {
                 ...game,
@@ -78,10 +78,10 @@ async function main() {
                 return;
             }
 
-            if(info.ships.length !== 0){
-                socket.emit("not positioned all ships");
-                return;
-            }
+            // if(info.ships.length !== 0){
+            //     socket.emit("not positioned all ships");
+            //     return;
+            // }
 
             game = {
                 ...game,
