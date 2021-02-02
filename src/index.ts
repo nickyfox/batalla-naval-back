@@ -165,9 +165,50 @@ async function main() {
             }
         });
 
-        socket.on("shoot random cell", (info: {room: string, isPlayer1Shooting: boolean}) => {
+        socket.on("shoot random cell", (info: {room: string, isPlayer1: boolean}) => {
+            shootRandomCell(info)
+        });
+
+        socket.on("turn time finished", (info: {room: string, isPlayer1: boolean}) => {
+            shootRandomCell(info)
+            if(info.isPlayer1) {
+                game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true}}
+            } else {
+                game = {...game, player1: {...game.player1, turn: true}, player2: {...game.player2, turn: false}}
+            }
+            io.to(info.room).emit("update game", game)
+        });
+
+        socket.on("player wants rematch", (info: {room: string, isPlayer1: boolean}) => {
+            if(info.isPlayer1) {
+                io.to(info.room).emit("player 1 wants rematch")
+            } else {
+                io.to(info.room).emit("player 2 wants rematch")
+            }
+        });
+
+        socket.on("rematch", (info: {room: string}) => {
+            game = new Game(game.player1.user, game.player2.user, new Date().getTime());
+            io.to(info.room).emit("restart game", game);
+        });
+
+        socket.on("quit game", (info: {room: string, isPlayer1: boolean}) => {
+            if(info.isPlayer1){
+                socket.leave(info.room);
+                saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
+                    io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
+                });
+            } else {
+                socket.leave(info.room);
+                saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
+                    io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
+                });
+            }
+        })
+
+        function shootRandomCell(info: {room: string, isPlayer1: boolean}){
             console.log("RANDOM SHOOT");
-            if(info.isPlayer1Shooting){
+            if(info.isPlayer1){
                 if (!game.player1.turn) {
                     console.log("NOT PLAYER 1 TURN");
                     socket.emit("not your turn");
@@ -225,46 +266,13 @@ async function main() {
                 }
                 io.to(info.room).emit("update game", game)
             }
-        });
+        }
 
-        socket.on("turn time finished", (info: {room: string, isPlayer1: boolean}) => {
-            if(info.isPlayer1) {
-                game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true}}
-            } else {
-                game = {...game, player1: {...game.player1, turn: true}, player2: {...game.player2, turn: false}}
-            }
-            io.to(info.room).emit("update game", game)
-        });
-
-        socket.on("player wants rematch", (info: {room: string, isPlayer1: boolean}) => {
-            if(info.isPlayer1) {
-                io.to(info.room).emit("player 1 wants rematch")
-            } else {
-                io.to(info.room).emit("player 2 wants rematch")
-            }
-        });
-
-        socket.on("rematch", (info: {room: string}) => {
-            game = new Game(game.player1.user, game.player2.user, new Date().getTime());
-            io.to(info.room).emit("restart game", game);
-        });
-
-        socket.on("quit game", (info: {room: string, isPlayer1: boolean}) => {
-            if(info.isPlayer1){
-                socket.leave(info.room);
-                saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
-                    io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
-                });
-            } else {
-                socket.leave(info.room);
-                saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
-                    io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
-                });
-            }
-        })
     });
 
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
 }
+
+
 
 main();
