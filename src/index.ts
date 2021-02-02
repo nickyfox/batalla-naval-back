@@ -165,18 +165,12 @@ async function main() {
             }
         });
 
-        socket.on("shoot random cell", (info: {room: string, isPlayer1: boolean}) => {
-            shootRandomCell(info)
+        socket.on("shoot random cell", (info: {room: string, isPlayer1Shooting: boolean}) => {
+            shootRandomCell(info.room, info.isPlayer1Shooting)
         });
 
         socket.on("turn time finished", (info: {room: string, isPlayer1: boolean}) => {
-            shootRandomCell(info)
-            if(info.isPlayer1) {
-                game = {...game, player1: {...game.player1, turn: false}, player2: {...game.player2, turn: true}}
-            } else {
-                game = {...game, player1: {...game.player1, turn: true}, player2: {...game.player2, turn: false}}
-            }
-            io.to(info.room).emit("update game", game)
+            shootRandomCell(info.room, info.isPlayer1);
         });
 
         socket.on("player wants rematch", (info: {room: string, isPlayer1: boolean}) => {
@@ -204,11 +198,11 @@ async function main() {
                     io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                 });
             }
-        })
+        });
 
-        function shootRandomCell(info: {room: string, isPlayer1: boolean}){
+        function shootRandomCell(room: string, isPlayer1: boolean){
             console.log("RANDOM SHOOT");
-            if(info.isPlayer1){
+            if(isPlayer1){
                 if (!game.player1.turn) {
                     console.log("NOT PLAYER 1 TURN");
                     socket.emit("not your turn");
@@ -233,10 +227,10 @@ async function main() {
                 if (game.player2.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 1 WON");
                     saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
-                        io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
+                        io.to(room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                     });
                 }
-                io.to(info.room).emit("update game", game);
+                io.to(room).emit("update game", game);
             } else {
                 if(!game.player2.turn){
                     console.log("NOT PLAYER 2 TURN");
@@ -261,13 +255,12 @@ async function main() {
                 if(game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");
                     saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
-                        io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
+                        io.to(room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                     });
                 }
-                io.to(info.room).emit("update game", game)
+                io.to(room).emit("update game", game)
             }
         }
-
     });
 
     await server.listen(app.app.get('port'), () => console.log(`Server running on port ${app.app.get('port')}!`))
