@@ -3,7 +3,7 @@ import {createPool, Pool} from "mysql2/promise";
 
 function connect() {
     return createPool({
-        host: 'localhost',
+        host: '127.0.0.1',
         user: 'root',
         password: 'password',
         port: 3306,

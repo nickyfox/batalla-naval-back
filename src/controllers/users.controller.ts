@@ -113,7 +113,7 @@ export async function getPlayerMatchHistory(req: Request, res: Response){
         })
     };
 
-    result = {...result, history: result.history.slice(Math.max(result.history.length - 5, 0))};
+    // result = {...result, history: result.history.slice(Math.max(result.history.length - 5, 0))};
     console.log("RESULT: ", result);
     return res.json(result)
 }
