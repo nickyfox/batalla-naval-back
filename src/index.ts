@@ -6,6 +6,7 @@ const socketio = require("socket.io");
 import {findUserById, saveMatchHistory} from "./services/user.services"
 import {BoardCell} from "./game/BoardCell";
 import {Ship} from "./game/Ship";
+import {TaskScheduler} from "./timer";
 
 async function main() {
     const port = process.env.PORT || "8000";
@@ -69,7 +70,14 @@ async function main() {
                 player1: {...game.player1, positionedShips: true, turn: game.player2.positionedShips, board: info.board}
             };
             io.to(info.room).emit("update game player 1", game.player1)
-            if (game.player2.positionedShips) timer(info.room, !game.player2.positionedShips, false)
+            if (game.player2.positionedShips)
+                TaskScheduler.start({
+                    id: `${info.room}`,
+                    onTick: (i: number) => io.to(info.room).emit('currentTime', {currentTime: 15-i}),
+                    onTimeout: () => shootRandomCell(info.room, true),
+                    maxIterations: 15,
+                    interval: 1000
+                })
         });
 
         socket.on('send board with placed ships for player 2', (info: { room: string, board: Array<BoardCell>, ships: Ship[] }) => {
@@ -89,7 +97,13 @@ async function main() {
                 player2: {...game.player2, turn: game.player1.positionedShips, positionedShips: true, board: info.board}
             };
             io.to(info.room).emit("update game player 2", game.player2)
-            if (game.player1.positionedShips) timer(info.room, !game.player1.positionedShips, false)
+            if (game.player1.positionedShips)  TaskScheduler.start({
+                id: `${info.room}`,
+                onTick: (i: number) => io.to(info.room).emit('currentTime', {currentTime: 15-i}),
+                onTimeout: () => shootRandomCell(info.room, false),
+                maxIterations: 15,
+                interval: 1000
+            })
         });
 
         /**
@@ -128,15 +142,22 @@ async function main() {
                     player1: {...game.player1, turn: false},
                     player2: {...game.player2, turn: true, board: newBoard}
                 };
-
+                TaskScheduler.cancel(`${info.room}`)
                 if (game.player2.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 1 WON");
                     saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                     });
+                } else {
+                    TaskScheduler.start({
+                        id: `${info.room}`,
+                        onTick: (i: number) => io.to(info.room).emit('currentTime', {currentTime:  15-i}),
+                        onTimeout: () => shootRandomCell(info.room,false),
+                        maxIterations: 15,
+                        interval: 1000
+                    })
                 }
                 io.to(info.room).emit("update game", game);
-                timer(info.room, false, false)
             } else {
                 console.log("SHOOT PLAYER 1: ", info.cell);
                 if (!game.player2.turn) {
@@ -156,25 +177,33 @@ async function main() {
                     player2: {...game.player2, turn: false},
                     player1: {...game.player1, turn: true, board: newBoard}
                 };
+                TaskScheduler.cancel(`${info.room}`)
                 if (game.player1.board.filter(cell => cell.occupied).filter(occupiedCells => !occupiedCells.shot).length === 0) {
                     console.log("PLAYER 2 WON");
-                    timer(info.room, false, true)
                     saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                         io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                     });
+                } else {
+                    TaskScheduler.start({
+                        id: `${info.room}`,
+                        onTick: (i: number) => io.to(info.room).emit('currentTime', {currentTime: 15-i}),
+                        onTimeout: () => shootRandomCell(info.room,true),
+                        maxIterations: 15,
+                        interval: 1000
+                    })
                 }
                 io.to(info.room).emit("update game", game)
-                timer(info.room, true, false)
             }
         });
 
         socket.on("shoot random cell", (info: { room: string, isPlayer1Shooting: boolean }) => {
+            TaskScheduler.cancel(`${info.room}`)
             shootRandomCell(info.room, info.isPlayer1Shooting)
         });
 
-        socket.on("turn time finished", (info: { room: string, isPlayer1: boolean }) => {
-            shootRandomCell(info.room, info.isPlayer1);
-        });
+        // socket.on("turn time finished", (info: { room: string, isPlayer1: boolean }) => {
+        //     shootRandomCell(info.room, info.isPlayer1);
+        // });
 
         socket.on("player wants rematch", (info: { room: string, isPlayer1: boolean }) => {
             if (info.isPlayer1) {
@@ -191,41 +220,19 @@ async function main() {
 
         socket.on("quit game", (info: { room: string, isPlayer1: boolean }) => {
             if (info.isPlayer1) {
-                timer(info.room, info.isPlayer1, true)
+                TaskScheduler.clear()
                 socket.leave(info.room);
                 saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                 });
             } else {
-                timer(info.room, info.isPlayer1, true)
+                TaskScheduler.clear()
                 socket.leave(info.room);
                 saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
                 });
             }
         });
-
-        var interval: number;
-
-        function timer(room: string, isPlayer1: boolean, justClearInterval: boolean) {
-            if (!justClearInterval) {
-                if (typeof interval !== 'undefined') clearInterval(interval)
-                let countdown = 15;
-                interval = setInterval(function (func: number) {
-                    console.log("interval for player1: ", isPlayer1)
-                    console.log(countdown)
-                    countdown--;
-                    io.to(room).emit('currentTime', {currentTime: countdown});
-                    if (countdown == 0) {
-                        clearInterval(interval);
-                        shootRandomCell(room, isPlayer1);
-                    }
-                }, 1000);
-            } else {
-                clearInterval(interval)
-            }
-        }
-
 
         function shootRandomCell(room: string, isPlayer1: boolean) {
             console.log("RANDOM SHOOT");
@@ -258,7 +265,13 @@ async function main() {
                     });
                 }
                 io.to(room).emit("update game", game);
-                timer(room, false, false)
+                TaskScheduler.start({
+                    id: `${room}`,
+                    onTick: (i: number) => io.to(room).emit('currentTime', {currentTime: 15-i}),
+                    onTimeout: () => shootRandomCell(room,false),
+                    maxIterations: 15,
+                    interval: 1000
+                })
             } else {
                 if (!game.player2.turn) {
                     console.log("NOT PLAYER 2 TURN");
@@ -287,8 +300,13 @@ async function main() {
                     });
                 }
                 io.to(room).emit("update game", game)
-                timer(room, true, false)
-            }
+                TaskScheduler.start({
+                    id: `${room}`,
+                    onTick: (i: number) => io.to(room).emit('currentTime', {currentTime: 15-i}),
+                    onTimeout: () => shootRandomCell(room,true),
+                    maxIterations: 15,
+                    interval: 1000
+                })            }
         }
     });
 
