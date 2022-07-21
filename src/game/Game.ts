@@ -26,11 +26,11 @@ function createEmptyBoard(player: string): Array<BoardCell> {
 function initializeShips(player: string): Array<Ship> {
     let ships: Ship[] = [];
     ships.push(new Ship(`${player}_ship_1`, `SHIP-1`,1));
-    ships.push(new Ship(`${player}_ship_2`, `SHIP-2`,1));
-    ships.push(new Ship(`${player}_ship_3`, `SHIP-3`,2));
-    ships.push(new Ship(`${player}_ship_4`, `SHIP-4`,2));
-    ships.push(new Ship(`${player}_ship_5`, `SHIP-5`,3));
-    ships.push(new Ship(`${player}_ship_6`, `SHIP-6`,3));
+    // ships.push(new Ship(`${player}_ship_2`, `SHIP-2`,1));
+    // ships.push(new Ship(`${player}_ship_3`, `SHIP-3`,2));
+    // ships.push(new Ship(`${player}_ship_4`, `SHIP-4`,2));
+    // ships.push(new Ship(`${player}_ship_5`, `SHIP-5`,3));
+    // ships.push(new Ship(`${player}_ship_6`, `SHIP-6`,3));
     return ships;
 }
 

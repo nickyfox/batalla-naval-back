@@ -49,6 +49,7 @@ async function main() {
 
         socket.on("leave room", (info: { room: string }) => {
             console.log("LEFT ROOM");
+            socket.to(info.room).emit('player left game')
             socket.leave(info.room);
         });
 
@@ -233,10 +234,6 @@ async function main() {
             shootRandomCell(info.room, info.isPlayer1Shooting)
         });
 
-        // socket.on("turn time finished", (info: { room: string, isPlayer1: boolean }) => {
-        //     shootRandomCell(info.room, info.isPlayer1);
-        // });
-
         socket.on("player wants rematch", (info: { room: string, isPlayer1: boolean }) => {
             if (info.isPlayer1) {
                 io.to(info.room).emit("player 1 wants rematch")
@@ -253,12 +250,14 @@ async function main() {
         socket.on("quit game", (info: { room: string, isPlayer1: boolean }) => {
             if (info.isPlayer1) {
                 TaskScheduler.clear()
+                socket.to(info.room).emit('player left game')
                 socket.leave(info.room);
                 saveMatchHistory({winner_id: game.player2.user.id}, {loser_id: game.player1.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 2 won", {winner: game.player2, loser: game.player1});
                 });
             } else {
                 TaskScheduler.clear()
+                socket.to(info.room).emit('player left game')
                 socket.leave(info.room);
                 saveMatchHistory({winner_id: game.player1.user.id}, {loser_id: game.player2.user.id}, game.initialTime).then(() => {
                     io.to(info.room).emit("player 1 won", {winner: game.player1, loser: game.player2});
@@ -266,6 +265,10 @@ async function main() {
             }
         });
 
+        socket.on('leaving game', (info: { room: string, isPlayer1: boolean })=> {
+            socket.to(info.room).emit('player left game')
+            socket.leave(info.room);
+        })
         function shootRandomCell(room: string, isPlayer1: boolean) {
             console.log("RANDOM SHOOT");
             if (isPlayer1) {
