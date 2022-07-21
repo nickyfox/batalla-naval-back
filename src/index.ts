@@ -13,7 +13,11 @@ async function main() {
     const app = new App(port);
     const server = http.createServer(app.app);
 
-    const io = socketio.listen(server);
+    const io = socketio.listen(server, {
+        cors: {
+            origin: ["http://localhost:8000", "https://batalla-naval-dipoi.herokuapp.com"]
+        }
+    });
 
     io.on('connection', (socket: any) => {
         console.log("Socket connected " + socket.id);
