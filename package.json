@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon index.js",
+    "start": "node index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-prebuild": "echo npm install"
+  },
+  "engines": {
+    "node": "16.x"
   },
   "keywords": [],
   "author": "",
