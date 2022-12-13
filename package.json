@@ -24,7 +24,7 @@
     "@types/node": "^13.13.5",
     "@types/socket.io": "^2.1.6",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "google-auth-library": "^6.0.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.1.0",
